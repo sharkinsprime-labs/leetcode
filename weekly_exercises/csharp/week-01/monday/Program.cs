@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System;
-using System.ComponentModel.DataAnnotations;
-
-class Week1TestClass
+﻿class TestClassMonday
 {
     static void Main(String[] args)
     {

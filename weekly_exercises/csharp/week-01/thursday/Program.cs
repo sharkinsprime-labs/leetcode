@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Intrinsics.X86;
-
-public class Encounter
+﻿public class Encounter
 {
     public string Player {get; set;} = "";
     public int Damage {get; set;}
@@ -18,7 +13,7 @@ public class DamageSummary
     public int HighDamageCount { get; set; }
 }
 
-class Week1TestClass2
+class TestClassThursday
 {
     static void Main(String[] args)
     {
