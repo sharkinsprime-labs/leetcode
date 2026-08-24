@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 
 class TestClass
 {
@@ -14,9 +13,17 @@ class TestClass
             new Mission { Name = "frozen relay", RequiredPower = 275, Completed = false},
         };
 
-        foreach (string mission in GetAvailableMissions(missions, player_power))
+        foreach (var outer in BuildMissionReadinessReport(missions, player_power))
         {
-            Console.WriteLine(mission);
+            Console.WriteLine($"{outer.Key}:");
+            MissionGroup group = outer.Value;
+            Console.WriteLine($"    count: {group.Count}");
+            Console.WriteLine($"    missions:");
+            foreach (string description in group.Missions)
+            {
+                Console.WriteLine($"          {description}");
+            }
+            Console.WriteLine($" ");
         }
     }
 
@@ -27,21 +34,48 @@ class TestClass
         public bool Completed { get; set; }
     }
 
-    public static List<string> GetAvailableMissions( List<Mission> missions, int playerPower)
+    public class MissionGroup
     {
-        List<string> mission_list = new List<string>();
+        public int Count { get; set; }
+        public List<string> Missions { get; set; } = new();
+    }
 
+    public static Dictionary<string, MissionGroup> BuildMissionReadinessReport(List<Mission> missions, int playerPower)
+    {
+        Dictionary<string, MissionGroup> summary = new()
+        {
+            {"READY", new MissionGroup()},
+            {"LOCKED", new MissionGroup()},
+            {"COMPLETED", new MissionGroup()}
+        };
 
         foreach (Mission mission in missions)
         {
-            if (mission.RequiredPower <= playerPower && !mission.Completed)
+            TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+
+            string status;
+            string description;
+
+            if (mission.Completed)
             {
-                TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-                string description = $"{textInfo.ToTitleCase(mission.Name)} - Required Power: {mission.RequiredPower}";
-                mission_list.Add(description);
+                status = "COMPLETED";
+                description = $"{textInfo.ToTitleCase(mission.Name)} - {status}";
             }
+            else if (mission.RequiredPower > playerPower)
+            {
+                status = "LOCKED";
+                description = $"{textInfo.ToTitleCase(mission.Name)} - {status} (Need {mission.RequiredPower - playerPower} More Power)";
+            }
+            else
+            {
+                status = "READY";
+                description = $"{textInfo.ToTitleCase(mission.Name)} - {status} (Required Power: {mission.RequiredPower})";
+            }
+            
+            summary[status].Count++;
+            summary[status].Missions.Add(description);
         }
 
-        return mission_list;
+        return summary;
     }
 }
